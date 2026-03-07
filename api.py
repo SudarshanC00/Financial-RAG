@@ -38,7 +38,7 @@ app.add_middleware(
         "http://127.0.0.1:3001",
         "https://financial-rag-k397.onrender.com",
     ],
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origin_regex=r"https://.*\.(vercel\.app|hf\.space)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

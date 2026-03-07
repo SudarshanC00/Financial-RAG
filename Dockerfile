@@ -21,6 +21,9 @@ COPY config.py ingest.py indexer.py query_engine.py main.py api.py ./
 # Create storage directories
 RUN mkdir -p storage/documents storage/uploads storage/qdrant
 
-EXPOSE 8000
+# Hugging Face Spaces uses port 7860, Render uses 8000
+# The PORT env var is set by the platform
+ENV PORT=7860
+EXPOSE 7860
 
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD uvicorn api:app --host 0.0.0.0 --port ${PORT}
