@@ -20,8 +20,18 @@ export default function UploadModal({ onClose, onUploaded }: UploadModalProps) {
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
         if (acceptedFiles.length > 0) {
-            setFile(acceptedFiles[0]);
+            const uploadedFile = acceptedFiles[0];
+            setFile(uploadedFile);
             setError("");
+
+            // Auto-detect company name from filename
+            // e.g. "Nvidia_10k_report.pdf" -> "Nvidia"
+            const nameMatch = uploadedFile.name.match(/^([A-Za-z0-9]+)/);
+            if (nameMatch && nameMatch[1]) {
+                const detectedName = nameMatch[1];
+                // Only set if field is empty
+                setCompanyName((prev) => prev.trim() === "" ? detectedName : prev);
+            }
         }
     }, []);
 
@@ -71,7 +81,7 @@ export default function UploadModal({ onClose, onUploaded }: UploadModalProps) {
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} autoComplete="off">
                     <div
                         {...getRootProps()}
                         className={`dropzone ${isDragActive ? "dropzone--active" : ""}`}
@@ -105,9 +115,11 @@ export default function UploadModal({ onClose, onUploaded }: UploadModalProps) {
                         <input
                             className="form-input"
                             type="text"
-                            placeholder="e.g., Apple Inc."
+                            placeholder="e.g., Nvidia Inc."
                             value={companyName}
                             onChange={(e) => setCompanyName(e.target.value)}
+                            name="company_name"
+                            autoComplete="new-password"
                             required
                         />
                     </div>
@@ -117,9 +129,11 @@ export default function UploadModal({ onClose, onUploaded }: UploadModalProps) {
                         <input
                             className="form-input"
                             type="text"
-                            placeholder="e.g., 10-K Annual Report FY2025"
+                            placeholder="e.g., 10-K Annual Report"
                             value={documentTitle}
                             onChange={(e) => setDocumentTitle(e.target.value)}
+                            name="document_title"
+                            autoComplete="off"
                         />
                     </div>
 
@@ -128,9 +142,11 @@ export default function UploadModal({ onClose, onUploaded }: UploadModalProps) {
                         <input
                             className="form-input"
                             type="text"
-                            placeholder="e.g., Sep 28, 2025"
+                            placeholder="e.g., Fiscal Year 2025"
                             value={documentDate}
                             onChange={(e) => setDocumentDate(e.target.value)}
+                            name="document_date"
+                            autoComplete="off"
                         />
                     </div>
 

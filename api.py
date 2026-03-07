@@ -203,7 +203,8 @@ async def upload_document(
 
     # Determine document title
     if not document_title:
-        document_title = f"{company_name} - {file.filename}"
+        base_name = f"{company_name}" if company_name else "Filing"
+        document_title = f"{base_name} - {file.filename}"
 
     # Save uploaded file
     upload_path = os.path.join(UPLOADS_DIR, f"{doc_id}_{file.filename}")
