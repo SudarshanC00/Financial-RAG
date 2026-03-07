@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { api } from "@/lib/api";
 import { DocumentInfo } from "@/lib/types";
 import Sidebar from "@/components/Sidebar";
@@ -10,21 +10,26 @@ export default function HomePage() {
   const [documents, setDocuments] = useState<DocumentInfo[]>([]);
   const [showUpload, setShowUpload] = useState(false);
 
-  const fetchDocuments = useCallback(async () => {
-    try {
-      const docs = await api.listDocuments();
-      setDocuments(docs);
-    } catch {
-      console.error("Failed to fetch documents");
-    }
-  }, []);
 
   useEffect(() => {
-    fetchDocuments();
-    // Poll for status updates every 5 seconds
-    const interval = setInterval(fetchDocuments, 5000);
-    return () => clearInterval(interval);
-  }, [fetchDocuments]);
+    let active = true;
+
+    const loadDocs = async () => {
+      try {
+        const docs = await api.listDocuments();
+        if (active) setDocuments(docs);
+      } catch {
+        // ignore
+      }
+    };
+
+    loadDocs();
+    const interval = setInterval(loadDocs, 5000);
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   const handleUploaded = (doc: DocumentInfo) => {
     setDocuments((prev) => [doc, ...prev]);

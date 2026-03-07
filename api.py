@@ -5,17 +5,16 @@ Exposes ingestion, querying, and document management as REST endpoints
 that the Next.js frontend consumes.
 """
 
-import os
 import json
-import uuid
-import shutil
 import logging
+import os
+import shutil
+import uuid
 from datetime import datetime
 from typing import Optional
 
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks
+from fastapi import BackgroundTasks, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from config import OPENAI_API_KEY
@@ -100,7 +99,7 @@ def _run_ingestion(doc_id: str, pdf_path: str, document_title: str, document_dat
     """Background task: ingest PDF and build vector index."""
     import sys
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    
+
     # Set up logging for background tasks
     logging.basicConfig(
         level=logging.INFO,
@@ -194,7 +193,7 @@ async def upload_document(
         raise HTTPException(status_code=400, detail="Only PDF files are supported")
 
     doc_id = str(uuid.uuid4())[:8]
-    
+
     # Determine document title
     if not document_title:
         document_title = f"{company_name} - {file.filename}"
@@ -278,7 +277,7 @@ async def query_document(request: QueryRequest):
         )
 
     try:
-        from indexer import load_index, build_recursive_retriever
+        from indexer import build_recursive_retriever, load_index
         from query_engine import build_query_engine, format_response
 
         collection_name = _get_collection_name(request.document_id)
@@ -320,7 +319,7 @@ async def query_document(request: QueryRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s | %(levelname)-7s | %(name)s | %(message)s",
@@ -328,5 +327,5 @@ if __name__ == "__main__":
     )
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("openai").setLevel(logging.WARNING)
-    
+
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

@@ -8,26 +8,25 @@ LLM-based summaries for each table to enable recursive retrieval.
 Supports any company's financial documents (10-K, 10-Q, Annual Reports).
 """
 
-import re
 import logging
+import re
 import uuid
 from typing import Optional
 
-from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling.datamodel.base_models import InputFormat
 from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling_core.types.doc import DocItemLabel
-
-from llama_index.core.schema import TextNode, IndexNode
 from llama_index.core.node_parser import SentenceSplitter
+from llama_index.core.schema import IndexNode, TextNode
 from llama_index.llms.openai import OpenAI
 
 from config import (
+    CHUNK_OVERLAP,
+    CHUNK_SIZE,
+    MULTIPLIER_PATTERNS,
     OPENAI_API_BASE,
     VISION_LLM,
-    CHUNK_SIZE,
-    CHUNK_OVERLAP,
-    MULTIPLIER_PATTERNS,
 )
 
 logger = logging.getLogger(__name__)
@@ -71,8 +70,8 @@ def summarize_table(table_markdown: str, section_title: str, page_num: int) -> s
     This summary becomes the searchable vector; the raw table is retrieved.
     """
     llm = OpenAI(
-        model=VISION_LLM, 
-        api_base=OPENAI_API_BASE, 
+        model=VISION_LLM,
+        api_base=OPENAI_API_BASE,
         temperature=0.0,
         max_tokens=1024
     )
@@ -137,7 +136,7 @@ def ingest_pdf(
     result = converter.convert(pdf_path)
     doc = result.document
 
-    logger.info(f"Docling conversion complete. Processing elements...")
+    logger.info("Docling conversion complete. Processing elements...")
 
     # ── Step 2: Detect global unit multiplier ─────────────────────────────
     # Scan full document text for the multiplier (usually in header/notes)

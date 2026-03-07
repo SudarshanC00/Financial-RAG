@@ -9,8 +9,8 @@ Commands:
 
 import argparse
 import logging
-import sys
 import os
+import sys
 
 # Ensure project root is on the path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -33,8 +33,8 @@ def setup_logging(verbose: bool = False):
 
 def cmd_ingest(args):
     """Run the ingestion pipeline."""
-    from ingest import ingest_pdf
     from indexer import create_index
+    from ingest import ingest_pdf
 
     pdf_path = args.pdf
     if not os.path.exists(pdf_path):
@@ -56,14 +56,14 @@ def cmd_ingest(args):
 
     # Step 2: Build Qdrant index
     print("\n📦 Building vector index...")
-    index = create_index(nodes)
+    create_index(nodes)
     print(f"✅ Index created successfully! ({len(nodes)} total nodes)")
-    print(f"   Stored at: ./storage/")
+    print("   Stored at: ./storage/")
 
 
 def cmd_query(args):
     """Run queries against the index."""
-    from indexer import load_or_create_index, build_recursive_retriever
+    from indexer import build_recursive_retriever, load_or_create_index
     from query_engine import build_query_engine, format_response, interactive_query
 
     print("🔍 Loading index...")

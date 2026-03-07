@@ -10,12 +10,12 @@ Supports any company's financial documents dynamically.
 
 import logging
 
+from llama_index.core.prompts import PromptTemplate
 from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.response_synthesizers import get_response_synthesizer
-from llama_index.core.prompts import PromptTemplate
 from llama_index.llms.openai import OpenAI
 
-from config import REASONING_LLM, OPENAI_API_BASE
+from config import OPENAI_API_BASE, REASONING_LLM
 
 logger = logging.getLogger(__name__)
 
@@ -93,8 +93,8 @@ def build_query_engine(
     and GPT-4o as the synthesis LLM.
     """
     llm = OpenAI(
-        model=REASONING_LLM, 
-        api_base=OPENAI_API_BASE, 
+        model=REASONING_LLM,
+        api_base=OPENAI_API_BASE,
         temperature=0.0,
         max_tokens=512
     )

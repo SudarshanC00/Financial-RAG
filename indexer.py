@@ -7,29 +7,26 @@ for search, but the actual raw table data is retrieved via IndexNode linking.
 Supports per-document collections for multi-company document management.
 """
 
-import os
 import logging
+import os
 from typing import Optional
 
+import qdrant_client
 from llama_index.core import (
-    VectorStoreIndex,
     StorageContext,
+    VectorStoreIndex,
     load_index_from_storage,
 )
-from llama_index.core.schema import TextNode, IndexNode
 from llama_index.core.retrievers import RecursiveRetriever
-from llama_index.core.node_parser import SentenceSplitter
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.vector_stores.qdrant import QdrantVectorStore
 
-import qdrant_client
-
 from config import (
+    DEFAULT_COLLECTION_NAME,
+    EMBEDDING_DIM,
+    EMBEDDING_MODEL,
     OPENAI_API_BASE,
     QDRANT_PATH,
-    DEFAULT_COLLECTION_NAME,
-    EMBEDDING_MODEL,
-    EMBEDDING_DIM,
     SIMILARITY_TOP_K,
 )
 
@@ -183,12 +180,12 @@ def build_recursive_retriever(index: VectorStoreIndex) -> RecursiveRetriever:
     # Build a mapping of node_id -> node for all nodes in the docstore
     all_nodes_dict = {}
     docstore = index.storage_context.docstore
-    
+
     # Get all nodes from docstore
     nodes = list(docstore.docs.values())
     for node in nodes:
         all_nodes_dict[node.node_id] = node
-    
+
     logger.info(f"Recursive retriever initialized with {len(all_nodes_dict)} nodes in node_dict")
 
     recursive_retriever = RecursiveRetriever(
